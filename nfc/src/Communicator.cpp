@@ -1,14 +1,15 @@
 #include "../include/Communicator.h"
 
 Communicator::Communicator(){
-    m_apduLength = 264;
-    m_apduCommand = static_cast<uint8_t*>(malloc(m_apduLength));
-    m_apduResponse = static_cast<uint8_t*>(malloc(m_apduLength));
+    m_capdulen = 0;
+    m_rapdulen = MAX_DATA_LENGTH;
+    m_capdu = static_cast<uint8_t*>(malloc(MAX_DATA_LENGTH));
+    m_rapdu = static_cast<uint8_t*>(malloc(MAX_DATA_LENGTH));
 }
 
 Communicator::~Communicator(){
-    free(m_apduCommand);
-    free(m_apduResponse);
+    free(m_capdu);
+    free(m_rapdu);
 }
 
 bool Communicator::open(){
@@ -37,52 +38,48 @@ bool Communicator::isTargetPresent(){
     return (nfc_initiator_select_passive_target(m_nfcDevice, m_nfcModulation, NULL, 0, &m_nfcTarget)>0);
 }
 
-bool Communicator::selectApplication(std::string appId){
+bool Communicator::selectApplication(std::string appId, std::string &response){
     std::vector<uint8_t> selectApdu = hexStringToByteArray("00A40400");
     std::vector<uint8_t> appIdHex = hexStringToByteArray(appId);
     selectApdu.push_back((uint8_t)appIdHex.size());
     selectApdu.insert(selectApdu.end(), appIdHex.begin(), appIdHex.end());
 
     uint8_t *cmd = &selectApdu[0];
-    int apduCommandLength=selectApdu.size();
-    memcpy(m_apduCommand, cmd, apduCommandLength);
+    m_capdulen = selectApdu.size();
+    memcpy(m_capdu, cmd, m_capdulen);
 
-    int res = nfc_initiator_transceive_bytes(m_nfcDevice, m_apduCommand, apduCommandLength, m_apduResponse, m_apduLength, 500);
+    int res = nfc_initiator_transceive_bytes(m_nfcDevice, m_capdu, m_capdulen, m_rapdu, m_rapdulen, 500);
     if(res<0){
         return false;
     }
 
-    if(res<2 || m_apduResponse[res-2] != 0x90 || m_apduResponse[res-1] != 0x00){
+    if(res<2 || m_rapdu[res-2] != 0x90 || m_rapdu[res-1] != 0x00){
         return false;
     }
 
+    response = byteArrayToString(m_rapdu, 0, res-2);
     return true;
 }
 
 bool Communicator::send(const std::string &message, std::string &response){
-    std::vector<uint8_t> apduCmd = stringToByteArray(message);
-    uint8_t *cmd = &apduCmd[0];
-    int apduCommandLength=apduCmd.size();
-    memcpy(m_apduCommand, cmd, apduCommandLength);
-
-    for (int i=0 ; i<apduCmd.size() ; i++) {
-        printf("%02x ", cmd[i]);
+    if(message.size()>MAX_DATA_LENGTH){
+        return false;
     }
-    printf("\n");
 
-    int res = nfc_initiator_transceive_bytes(m_nfcDevice, m_apduCommand, apduCommandLength, m_apduResponse, m_apduLength, 500);
+    std::vector<uint8_t> apduCmd(message.begin(), message.end());
+    uint8_t *cmd = &apduCmd[0];
+    m_capdulen = apduCmd.size();
+    memcpy(m_capdu, cmd, m_capdulen);
+
+    int res = nfc_initiator_transceive_bytes(m_nfcDevice, m_capdu, m_capdulen, m_rapdu, m_rapdulen, 500);
     if (res<0) {
         return false;
     }
 
-    if(res<2 || m_apduResponse[res-2] != 0x90 || m_apduResponse[res-1] != 0x00){
+    if(res<2 || m_rapdu[res-2] != 0x90 || m_rapdu[res-1] != 0x00){
         return false;
     }
 
-    std::stringstream ss;
-    for(unsigned int i=0 ; i<res-2 ; i++){
-        ss << m_apduResponse[i];
-    }
-    response = ss.str();
+    response = byteArrayToString(m_rapdu, 0, res-2);
     return true;
 }

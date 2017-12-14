@@ -1,21 +1,24 @@
 #include <iostream>
-#include "include/Communicator.h"
+
+#include "nfc/include/Communicator.h"
+#include "food/include/FoodUtils.h"
 
 int main(int argc, char const *argv[]) {
+    std::vector<Menu> menus;
+    loadMenus("menus", menus);
+
     Communicator com;
     if(com.open()){
-        std::cout << "device opened" << std::endl;
+        std::cout << "device opened. Waiting for device..." << std::endl;
         while(!com.isTargetPresent());
 
-        if(com.selectApplication("F222222222")){
-            std::cout << "app selected" << std::endl;
-            std::string resp;
-            if(com.send("hello world", resp)){
-                std::cout << "sent !" << std::endl;
-                std::cout << "received: " << resp << std::endl;
-            }
-            else{
-                std::cout << "could not send message" << std::endl;
+        std::string response;
+        if(com.selectApplication("F222222222", response)){
+            std::cout << "response = [" << response << "]" << std::endl;
+            if(response=="MENU"){
+                if(!com.send(response+toString(menus), response)){
+                    std::cout << "could not send message" << std::endl;
+                }
             }
         }
         else{

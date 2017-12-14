@@ -6,7 +6,7 @@
 #include <nfc/nfc.h>
 
 #include <vector>
-#include "Utils.h"
+#include "NfcUtils.h"
 
 class Communicator {
     private:
@@ -15,11 +15,12 @@ class Communicator {
         nfc_context *m_nfcContext;
         nfc_modulation m_nfcModulation;
 
-        uint8_t *m_apduCommand;
-        uint8_t *m_apduResponse;
-        size_t m_apduLength;
+        uint8_t *m_capdu;
+        uint8_t *m_rapdu;
+        size_t m_capdulen;
+        size_t m_rapdulen;
 
-        std::string m_appId;
+        static constexpr size_t MAX_DATA_LENGTH = 65535;
 
     public:
         Communicator();
@@ -29,7 +30,7 @@ class Communicator {
         void close();
 
         bool isTargetPresent();
-        bool selectApplication(std::string appId);
+        bool selectApplication(std::string appId, std::string &response);
         bool send(const std::string &message, std::string &response);
 };
 
