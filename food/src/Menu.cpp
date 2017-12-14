@@ -1,4 +1,4 @@
-#include "Menu.h"
+#include "../include/Menu.h"
 
 Menu::Menu(){
 }
@@ -45,6 +45,19 @@ void Menu::setDessert(Food dessert){
 
 void Menu::updatePrice(){
     m_price = m_sandwich.getPrice()+m_extra.getPrice()+m_drink.getPrice()+m_dessert.getPrice()+(m_size+1)*0.20f;
+}
+
+std::string Menu::toJson(){
+    std::stringstream ss;
+    ss << "{";
+    ss << "\"price\":\"" << m_price << "\",";
+    ss << "\"size\":\"" << m_size << "\",";
+    ss << "\"sandwich\":" << m_sandwich.toJson() << ",";
+    ss << "\"extra\":" << m_extra.toJson() << ",";
+    ss << "\"drink\":" << m_drink.toJson() << ",";
+    ss << "\"dessert\":" << m_dessert.toJson();
+    ss << "}";
+    return ss.str();
 }
 
 std::ostream& operator<<(std::ostream& os, const Menu& menu){

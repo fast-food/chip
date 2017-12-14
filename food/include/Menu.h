@@ -34,6 +34,8 @@ class Menu {
 
         void updatePrice();
 
+        std::string toJson();
+
         friend std::ostream& operator<<(std::ostream& os, const Menu& menu);
         friend std::istream& operator>>(std::istream& is, Menu& menu);
 };

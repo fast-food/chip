@@ -50,9 +50,15 @@ static bool loadMenus(std::string filename, std::vector<Menu> &menus){
     return false;
 }
 
-static std::string toString(const std::vector<Menu> &menus){
+static std::string toJson(const std::vector<Menu> &menus){
     std::stringstream ss;
-    ss << menus;
+    ss << "{";
+    ss << "\"menus\":[";
+    for(auto menu : menus){
+        ss << menu.toJson() << ",";
+    }
+    ss << "]";
+    ss << "}";
     return ss.str();
 }
 
