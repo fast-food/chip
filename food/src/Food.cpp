@@ -25,11 +25,11 @@ void Food::setPrice(float price){
     m_price = price;
 }
 
-std::string Food::toJson(){
+std::string Food::toJson() const{
     std::stringstream ss;
     ss << "{";
     ss << "\"name\":\"" << m_name << "\",";
-    ss << "\"price\":\"" << m_price << "\"";
+    ss << "\"price\":" << m_price;
     ss << "}";
     return ss.str();
 }

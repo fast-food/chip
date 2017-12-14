@@ -21,7 +21,7 @@ class Food {
         void setName(std::string name);
         void setPrice(float price);
 
-        std::string toJson();
+        std::string toJson() const;
 
         friend std::ostream& operator<<(std::ostream& os, const Food& food);
         friend std::istream& operator>>(std::istream& is, Food& food);

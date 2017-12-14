@@ -52,13 +52,14 @@ static bool loadMenus(std::string filename, std::vector<Menu> &menus){
 
 static std::string toJson(const std::vector<Menu> &menus){
     std::stringstream ss;
-    ss << "{";
-    ss << "\"menus\":[";
-    for(auto menu : menus){
-        ss << menu.toJson() << ",";
+    ss << "[";
+    for(int i=0 ; i<menus.size() ; i++){
+        ss << menus[i].toJson();
+        if(i!=menus.size()-1){
+            ss << ",";
+        }
     }
     ss << "]";
-    ss << "}";
     return ss.str();
 }
 

@@ -15,11 +15,6 @@ class Communicator {
         nfc_context *m_nfcContext;
         nfc_modulation m_nfcModulation;
 
-        uint8_t *m_capdu;
-        uint8_t *m_rapdu;
-        size_t m_capdulen;
-        size_t m_rapdulen;
-
         static constexpr size_t MAX_DATA_LENGTH = 65535;
 
     public:

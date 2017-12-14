@@ -47,11 +47,11 @@ void Menu::updatePrice(){
     m_price = m_sandwich.getPrice()+m_extra.getPrice()+m_drink.getPrice()+m_dessert.getPrice()+(m_size+1)*0.20f;
 }
 
-std::string Menu::toJson(){
+std::string Menu::toJson() const{
     std::stringstream ss;
     ss << "{";
-    ss << "\"price\":\"" << m_price << "\",";
-    ss << "\"size\":\"" << m_size << "\",";
+    ss << "\"price\":" << m_price << ",";
+    ss << "\"size\":" << m_size << ",";
     ss << "\"sandwich\":" << m_sandwich.toJson() << ",";
     ss << "\"extra\":" << m_extra.toJson() << ",";
     ss << "\"drink\":" << m_drink.toJson() << ",";
