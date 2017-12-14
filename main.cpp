@@ -16,7 +16,7 @@ int main(int argc, char const *argv[]) {
         if(com.selectApplication("F222222222", response)){
             std::cout << "response = [" << response << "]" << std::endl;
             if(response=="MENU"){
-                if(!com.send(response+toString(menus), response)){
+                if(!com.send(response+toJson(menus), response)){
                     std::cout << "could not send message" << std::endl;
                 }
             }
