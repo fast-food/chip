@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "nfc/include/Communicator.h"
-#include "food/include/FoodUtils.h"
+#include "../nfc/include/Communicator.h"
+#include "../food/include/FoodUtils.h"
 
 int main(int argc, char const *argv[]) {
     static const std::string MENU = "1";
