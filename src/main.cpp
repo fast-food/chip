@@ -1,43 +1,59 @@
 #include <iostream>
+#include <map>
+
+#include "../food/menuUtils.h"
 #include "../nfc/nfcManager.h"
 
+std::map<std::string, std::string> getCommands(){
+    std::map<std::string, std::string> cmds;
+
+    // menus
+    std::string menusFilename = "data/menus";
+    std::vector<Menu> menus;
+    if(!readMenusFromFile(menusFilename, menus)){
+        std::cout << "could not read menus : " << menusFilename << std::endl;
+        exit(1);
+    }
+
+    std::stringstream ss;
+    writeMenus(ss, menus);
+    cmds["1"] = ss.str();
+
+    // others...
+    cmds["0"] = "Hello World!!! :D";
+
+    return cmds;
+}
+
 int main(int argc, char const *argv[]) {
+    std::map<std::string, std::string> cmds = getCommands();
+
     NfcManager manager;
     if(manager.open()){
-        std::cout << "nfc device opened." << std::endl;
-        std::cout << "device : " << manager.getDeviceName() << std::endl;
+        std::cout << "Nfc device opened. Waiting for target..." << std::endl;
+        while(1){
+            while(!manager.isTargetPresent());
+
+            std::string response;
+            if(manager.selectApplication("F222222222", response)){
+                std::cout << "request = [" << response << "]" << std::endl;
+                for(const auto& cmd : cmds){
+                    if(response==cmd.first){
+                        if(!manager.send(cmd.first+cmd.second, response)){
+                            std::cout << "could not send message back" << std::endl;
+                        }
+                        break;
+                    }
+                }
+            }
+            else{
+                std::cout << "could not select app" << std::endl;
+            }
+        }
+        manager.close();
     }
     else{
-        std::cout << "could not open device." << std::endl;
+        std::cout << "could not open device" << std::endl;
     }
-    manager.close();
-
-    // static const std::string MENU = "1";
-    //
-    // std::vector<Menu> menus;
-    // loadMenus("food/menus", menus);
-    //
-    // Communicator com;
-    // if(com.open()){
-    //     std::cout << "device opened. Waiting for device..." << std::endl;
-    //     while(!com.isTargetPresent());
-    //
-    //     std::string response;
-    //     if(com.selectApplication("F222222222", response)){
-    //         std::cout << "response = [" << response << "]" << std::endl;
-    //         if(response==MENU){
-    //             if(!com.send(MENU+toJson(menus), response)){
-    //                 std::cout << "could not send message" << std::endl;
-    //             }
-    //         }
-    //     }
-    //     else{
-    //         std::cout << "could not select app" << std::endl;
-    //     }
-    //     com.close();
-    // }
-    // else{
-    //     std::cout << "could not open device" << std::endl;
-    // }
-    // return 0;
+    return 0;
 }

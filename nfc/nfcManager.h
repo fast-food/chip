@@ -10,7 +10,7 @@
 #include "nfcUtils.h"
 
 struct NfcManager {
-    static constexpr size_t MAX_DATA_LENGTH = 65535;
+    const size_t MAX_DATA_LENGTH = 65535;
 
     nfc_context* mNfcContext;
     nfc_device* mNfcDevice;
@@ -57,16 +57,11 @@ struct NfcManager {
         return (nfc_initiator_select_passive_target(mNfcDevice, mNfcModulation, NULL, 0, &nfcTarget)>0);
     }
 
-    bool selectApplication(std::string appId, std::string &response){
-        std::vector<uint8_t> selectApdu = hexStringToByteArray("00A40400");
-        std::vector<uint8_t> appIdHex = hexStringToByteArray(appId);
-        selectApdu.push_back((uint8_t)appIdHex.size());
-        selectApdu.insert(selectApdu.end(), appIdHex.begin(), appIdHex.end());
-
-        uint8_t *capdu = &selectApdu[0];
-        size_t capdulen = selectApdu.size();
-        uint8_t rapdu[3];
-        size_t rapdulen = 3;
+    bool transceive(std::vector<uint8_t>& apdu, std::string& response){
+        uint8_t *capdu = &apdu[0];
+        size_t capdulen = apdu.size();
+        uint8_t rapdu[MAX_DATA_LENGTH];
+        size_t rapdulen = MAX_DATA_LENGTH;
 
         int res = nfc_initiator_transceive_bytes(mNfcDevice, capdu, capdulen, rapdu, rapdulen, 500);
         if(res<0){
@@ -76,29 +71,26 @@ struct NfcManager {
         if(res<2 || rapdu[res-2] != 0x90 || rapdu[res-1] != 0x00){
             return false;
         }
-
+        
         response = byteArrayToString(rapdu, 0, res-2);
         return true;
     }
 
+    bool selectApplication(std::string appId, std::string &response){
+        std::vector<uint8_t> selectApdu = hexStringToByteArray("00A40400");
+        std::vector<uint8_t> appIdHex = hexStringToByteArray(appId);
+        selectApdu.push_back((uint8_t)appIdHex.size());
+        selectApdu.insert(selectApdu.end(), appIdHex.begin(), appIdHex.end());
+        return transceive(selectApdu, response);
+    }
+
     bool send(const std::string &message, std::string &response){
         std::vector<uint8_t> apduCmd(message.begin(), message.end());
-        uint8_t *capdu = &apduCmd[0];
-        size_t capdulen = apduCmd.size();
-        uint8_t rapdu[3];
-        size_t rapdulen = 3;
-
-        int res = nfc_initiator_transceive_bytes(mNfcDevice, capdu, capdulen, rapdu, rapdulen, 500);
-        if (res<0) {
+        if(apduCmd.size()>MAX_DATA_LENGTH){
+            std::cout << "Message length is too long!" << std::endl;
             return false;
         }
-
-        if(res<2 || rapdu[res-2] != 0x90 || rapdu[res-1] != 0x00){
-            return false;
-        }
-
-        response = byteArrayToString(rapdu, 0, res-2);
-        return true;
+        return transceive(apduCmd, response);
     }
 };
 
