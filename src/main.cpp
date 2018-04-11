@@ -5,23 +5,40 @@
 #include "../nfc/include/nfcManager.h"
 #include "../network/include/network.h"
 
+const std::string BASE_URL = "http://127.0.0.1:8080";
+
 std::map<std::string, std::string> getCommands(){
     std::map<std::string, std::string> cmds;
+    std::string json;
 
     // menus
-    std::string menusFilename = "data/menus";
     std::vector<Menu> menus;
-    if(!readMenusFromFile(menusFilename, menus)){
-        std::cout << "could not read menus : " << menusFilename << std::endl;
+    if(!requestUri(BASE_URL, "/menu", json)){
+        std::cout << "Could not get menus from server." << std::endl;
         exit(1);
     }
-
+    if(!parseMenus(json, menus)){
+        std::cout << "Could not parse menus." << std::endl;
+        exit(1);
+    }
     std::stringstream ss;
-    writeMenus(ss, menus);
+    writeFood(ss, menus);
     cmds["1"] = ss.str();
 
-    // others...
-    cmds["0"] = "Hello World!!! :D";
+
+    // food
+    std::vector<Food> food;
+    if(!requestUri(BASE_URL, "/food", json)){
+        std::cout << "Could not get food from server." << std::endl;
+        exit(1);
+    }
+    if(!parseFood(json, food)){
+        std::cout << "Could not parse food." << std::endl;
+        exit(1);
+    }
+    std::stringstream ss;
+    writeFood(ss, food);
+    cmds["2"] = ss.str();
 
     return cmds;
 }

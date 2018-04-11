@@ -33,23 +33,13 @@ bool request(const std::string& url, std::string& result){
     }
 }
 
-bool getFoodFromServer(const std::string& serverAddr, std::vector<Food>& food){
+bool requestUri(const std::string& baseUrl, const std::string& uri, std::string& jsonStr){
+    std::string serverAddr = baseUrl + uri;
     SERVER_DATA = "";
     std::string response;
     if(request(serverAddr, response)){
-        Json::Value root;
-        Json::Reader reader;
-        if (reader.parse(response.c_str(), root)){
-            std::vector<std::string> foodNames = {"sandwich", "extra", "drink"};
-            food.clear();
-            for(const auto& name : foodNames){
-                for(int i=0 ; i<root[name].size() ; i++){
-                    Food f(root[name][i]["id"].asInt(), root[name][i]["name"].asString());
-                    food.push_back(f);
-                }
-            }
-            return true;
-        }
+        jsonStr = response;
+        return true;
     }
     return false;
 }

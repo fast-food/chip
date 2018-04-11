@@ -4,7 +4,7 @@ void writeMenus(std::ostream& os, const std::vector<Menu>& menus){
     os << menus.size() << std::endl;
     for(const auto& m : menus){
         m.write(os);
-        os << std::endl;
+        os << " ";
     }
 }
 
@@ -35,6 +35,17 @@ bool readMenusFromFile(const std::string& filename, std::vector<Menu>& menus){
     if(file){
         readMenus(file, menus);
         file.close();
+        return true;
+    }
+    return false;
+}
+
+bool parseMenus(const std::string& jsonStr, std::vector<Menu>& menus){
+    Json::Value root;
+    Json::Reader reader;
+    if(reader.parse(jsonStr.c_str(), root)){
+        menus.clear();
+        // parse root to menus
         return true;
     }
     return false;

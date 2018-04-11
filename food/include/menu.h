@@ -3,36 +3,22 @@
 
 #include "food.h"
 #include <sstream>
-
-enum MenuSize {
-    SMALL,
-    LARGE,
-    UNDEFINED
-};
+#include <vector>
 
 class Menu {
     private:
         float mPrice;
-        MenuSize mSize;
-        Food mSandwich;
-        Food mDrink;
-        Food mExtra;
+        std::vector<FoodType> mFoodTypes;
 
     public:
         Menu();
-        Menu(MenuSize size, Food sandwich, Food drink, Food extra, float price);
+        Menu(float price);
 
         float getPrice() const;
-        MenuSize getSize() const;
-        Food getSandwich() const;
-        Food getExtra() const;
-        Food getDrink() const;
+        std::vector<FoodType> getFoodTypes() const;
 
-        void setPrice(float price);
-        void setSize(MenuSize size);
-        void setSandwich(Food sandwich);
-        void setExtra(Food extra);
-        void setDrink(Food drink);
+        void setPrice(const float& price);
+        void addFoodType(const FoodType& type);
 
         void write(std::ostream& os) const;
         void read(std::istream& is);
