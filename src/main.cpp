@@ -1,8 +1,9 @@
 #include <iostream>
 #include <map>
 
-#include "../food/menuUtils.h"
-#include "../nfc/nfcManager.h"
+#include "../food/include/menuUtils.h"
+#include "../nfc/include/nfcManager.h"
+#include "../network/include/network.h"
 
 std::map<std::string, std::string> getCommands(){
     std::map<std::string, std::string> cmds;

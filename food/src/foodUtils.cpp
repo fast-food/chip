@@ -1,8 +1,4 @@
-#ifndef FOODUTILS
-#define FOODUTILS
-
-#include <fstream>
-#include <sstream>
+#include "../include/foodUtils.h"
 
 bool fileToString(const std::string& filename, std::string& result){
    std::ifstream file(filename.c_str());
@@ -21,5 +17,3 @@ bool fileToString(const std::string& filename, std::string& result){
    }
    return false;
 }
-
-#endif

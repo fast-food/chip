@@ -1,11 +1,4 @@
-#ifndef NFCUTILS
-#define NFCUTILS
-
-#include <sstream>
-#include <vector>
-#include <stdint.h>
-#include <iostream>
-#include <iomanip>
+#include "../include/nfcUtils.h"
 
 uint8_t charToHex(char c){
    if(c >= '0' && c <= '9')
@@ -36,5 +29,3 @@ void print(const std::vector<uint8_t>& v) {
     }
     std::cout << std::endl;
 }
-
-#endif

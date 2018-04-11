@@ -1,11 +1,4 @@
-#ifndef MENUUTILS
-#define MENUUTILS
-
-#include <fstream>
-#include <sstream>
-#include <vector>
-
-#include "menu.h"
+#include "../include/menuUtils.h"
 
 void writeMenus(std::ostream& os, const std::vector<Menu>& menus){
     os << menus.size() << std::endl;
@@ -46,5 +39,3 @@ bool readMenusFromFile(const std::string& filename, std::vector<Menu>& menus){
     }
     return false;
 }
-
-#endif
