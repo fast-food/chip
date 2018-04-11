@@ -1,43 +1,17 @@
 #include "../include/foodUtils.h"
 
-void writeFood(std::ostream& os, const std::vector<Food>& food){
+void toStream(std::ostream& os, const std::vector<Food>& food){
     os << food.size() << std::endl;
     for(const auto& f : food){
         f.write(os);
-        std::cout << " ";
+        os << " ";
     }
 }
 
-bool writeFoodToFile(const std::string& filename, const std::vector<Food>& food){
-    std::ofstream file(filename.c_str());
-    if(file){
-        writeFood(file, food);
-        file.close();
-        return true;
-    }
-    return false;
-}
-
-void readFood(std::istream& is, std::vector<Food>& food){
-    std::string line;
-    getline(is, line);
-    int length = std::stoi(line);
-    food.resize(length);
-    for(int i=0 ; i<length ; i++){
-        Food f;
-        f.read(is);
-        food[i] = f;
-    }
-}
-
-bool readFoodFromFile(const std::string& filename, std::vector<Food>& food){
-    std::ifstream file(filename.c_str());
-    if(file){
-        readFood(file, food);
-        file.close();
-        return true;
-    }
-    return false;
+std::string toString(const std::vector<Food>& food){
+    std::stringstream ss;
+    toStream(ss, food);
+    return ss.str();    
 }
 
 bool parseFood(const std::string& jsonStr, std::vector<Food>& food){

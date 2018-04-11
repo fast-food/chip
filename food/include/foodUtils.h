@@ -8,10 +8,8 @@
 
 #include "food.h"
 
-void writeFood(std::ostream& os, const std::vector<Food>& food);
-bool writeFoodToFile(const std::string& filename, const std::vector<Food>& food);
-void readFood(std::istream& is, std::vector<Food>& food);
-bool readFoodFromFile(const std::string& filename, std::vector<Food>& food);
+void toStream(std::ostream& os, const std::vector<Food>& food);
+std::string toString(const std::vector<Food>& food);
 bool parseFood(const std::string& jsonStr, std::vector<Food>& food);
 
 #endif

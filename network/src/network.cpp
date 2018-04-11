@@ -35,6 +35,7 @@ bool request(const std::string& url, std::string& result){
 
 bool requestUri(const std::string& baseUrl, const std::string& uri, std::string& jsonStr){
     std::string serverAddr = baseUrl + uri;
+    jsonStr = "";
     SERVER_DATA = "";
     std::string response;
     if(request(serverAddr, response)){

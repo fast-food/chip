@@ -6,7 +6,7 @@
 
 #include <curl/curl.h>
 
-std::string SERVER_DATA;
+static std::string SERVER_DATA;
 
 size_t writeCallback(char* buf, size_t size, size_t nmemb, void* up);
 bool request(const std::string& url, std::string& result);

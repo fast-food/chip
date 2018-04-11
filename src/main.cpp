@@ -2,6 +2,7 @@
 #include <map>
 
 #include "../food/include/menuUtils.h"
+#include "../food/include/foodUtils.h"
 #include "../nfc/include/nfcManager.h"
 #include "../network/include/network.h"
 
@@ -21,10 +22,7 @@ std::map<std::string, std::string> getCommands(){
         std::cout << "Could not parse menus." << std::endl;
         exit(1);
     }
-    std::stringstream ss;
-    writeFood(ss, menus);
-    cmds["1"] = ss.str();
-
+    cmds["1"] = toString(menus);
 
     // food
     std::vector<Food> food;
@@ -36,9 +34,8 @@ std::map<std::string, std::string> getCommands(){
         std::cout << "Could not parse food." << std::endl;
         exit(1);
     }
-    std::stringstream ss;
-    writeFood(ss, food);
-    cmds["2"] = ss.str();
+    cmds["2"] = toString(food);
+
 
     return cmds;
 }
