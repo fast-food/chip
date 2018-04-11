@@ -45,7 +45,14 @@ bool parseMenus(const std::string& jsonStr, std::vector<Menu>& menus){
     Json::Reader reader;
     if(reader.parse(jsonStr.c_str(), root)){
         menus.clear();
-        // parse root to menus
+        for(int i=0 ; i<root["menus"].size() ; i++){
+            Menu menu(root["menus"][i]["price"].asFloat());
+            for(int j=0 ; j<root["menus"][i]["food_type"].size() ; j++){
+                FoodType type = (FoodType) root["menus"][i]["food_type"][j].asInt();
+                menu.addFoodType(type);
+                menus.push_back(menu);
+            }
+        }
         return true;
     }
     return false;
