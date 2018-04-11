@@ -52,7 +52,7 @@ bool NfcManager::transceive(std::vector<uint8_t>& apdu, std::string& response){
     uint8_t rapdu[MAX_DATA_LENGTH];
     size_t rapdulen = MAX_DATA_LENGTH;
 
-    int res = nfc_initiator_transceive_bytes(mNfcDevice, capdu, capdulen, rapdu, rapdulen, 500);
+    int res = nfc_initiator_transceive_bytes(mNfcDevice, capdu, capdulen, rapdu, rapdulen, 700);
     if(res<0){
         return false;
     }

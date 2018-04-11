@@ -1,4 +1,5 @@
 #include <iostream>
+#include <unistd.h>
 #include <map>
 
 #include "../food/include/menuUtils.h"
@@ -45,26 +46,25 @@ int main(int argc, char const *argv[]) {
 
     NfcManager manager;
     if(manager.open()){
+        std::string response, msg;
         std::cout << "Nfc device opened. Waiting for target..." << std::endl;
+
         while(1){
             while(!manager.isTargetPresent());
-
-            std::string response;
             if(manager.selectApplication("F222222222", response)){
-                std::cout << "request = [" << response << "]" << std::endl;
-                for(const auto& cmd : cmds){
-                    if(response==cmd.first){
-                        if(!manager.send(cmd.first+cmd.second, response)){
-                            std::cout << "could not send message back" << std::endl;
-                        }
-                        break;
+                while(response!=""){
+                    msg = response + cmds[response];
+                    if(!manager.send(msg, response)){
+                        std::cout << "error while transceiving..." << std::endl;
+                        response = "";
                     }
                 }
             }
             else{
-                std::cout << "could not select app" << std::endl;
+                std::cout << "select error" << std::endl;
             }
         }
+
         manager.close();
     }
     else{
