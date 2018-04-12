@@ -37,7 +37,6 @@ std::map<std::string, std::string> getCommands(){
     }
     cmds["2"] = toString(food);
 
-
     return cmds;
 }
 
@@ -55,7 +54,6 @@ int main(int argc, char const *argv[]) {
                 while(response!=""){
                     msg = response + cmds[response];
                     if(!manager.send(msg, response)){
-                        std::cout << "error while transceiving..." << std::endl;
                         response = "";
                     }
                 }
