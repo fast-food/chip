@@ -3,8 +3,8 @@ ODIR = obj
 PROG = main
 CXXFLAG = -std=c++11 -lcurl -ljsoncpp -lnfc
 
-$(PROG) : $(ODIR) $(ODIR)/network.o $(ODIR)/menuUtils.o $(ODIR)/food.o $(ODIR)/menu.o $(ODIR)/foodUtils.o $(ODIR)/nfcManager.o $(ODIR)/nfcUtils.o $(ODIR)/main.o
-	$(CC) -o $@ $(ODIR)/network.o $(ODIR)/menuUtils.o $(ODIR)/food.o $(ODIR)/menu.o $(ODIR)/foodUtils.o $(ODIR)/nfcManager.o $(ODIR)/nfcUtils.o $(ODIR)/main.o $(CXXFLAG)
+$(PROG) : $(ODIR) $(ODIR)/network.o $(ODIR)/menuUtils.o $(ODIR)/food.o $(ODIR)/menu.o $(ODIR)/foodUtils.o $(ODIR)/nfcManager.o $(ODIR)/apduCmd.o $(ODIR)/apduResp.o $(ODIR)/nfcUtils.o $(ODIR)/main.o
+	$(CC) -o $@ $(ODIR)/network.o $(ODIR)/menuUtils.o $(ODIR)/food.o $(ODIR)/menu.o $(ODIR)/foodUtils.o $(ODIR)/nfcManager.o $(ODIR)/apduCmd.o $(ODIR)/apduResp.o $(ODIR)/nfcUtils.o $(ODIR)/main.o $(CXXFLAG)
 
 $(ODIR)/network.o : ./network/src/network.cpp ./network/include/network.h
 	$(CC) -c $< -o $@ $(CXXFLAG)
@@ -22,6 +22,12 @@ $(ODIR)/foodUtils.o : ./food/src/foodUtils.cpp ./food/include/foodUtils.h ./food
 	$(CC) -c $< -o $@ $(CXXFLAG)
 
 $(ODIR)/nfcManager.o : ./nfc/src/nfcManager.cpp ./nfc/include/nfcManager.h ./nfc/include/nfcUtils.h
+	$(CC) -c $< -o $@ $(CXXFLAG)
+
+$(ODIR)/apduCmd.o : ./nfc/src/apduCmd.cpp ./nfc/include/apduCmd.h
+	$(CC) -c $< -o $@ $(CXXFLAG)
+
+$(ODIR)/apduResp.o : ./nfc/src/apduResp.cpp ./nfc/include/apduResp.h ./nfc/include/apduCmd.h
 	$(CC) -c $< -o $@ $(CXXFLAG)
 
 $(ODIR)/nfcUtils.o : ./nfc/src/nfcUtils.cpp ./nfc/include/nfcUtils.h

@@ -7,10 +7,29 @@
 #include "../nfc/include/nfcManager.h"
 #include "../network/include/network.h"
 
+
+
+#include <sstream>
+#include <fstream>
+std::string fileToString(std::string filename){
+    std::ifstream file(filename.c_str());
+    std::string line;
+    std::stringstream ss;
+    while(!file.eof()){
+        getline(file, line);
+        if(line != ""){
+            ss << line << std::endl;
+        }
+    }
+    file.close();
+    return ss.str();
+}
+
+
 const std::string BASE_URL = "http://127.0.0.1:8080";
 
-std::map<std::string, std::string> getCommands(){
-    std::map<std::string, std::string> cmds;
+std::map<uint8_t, std::string> getCommands(){
+    std::map<uint8_t, std::string> cmds;
     std::string json;
 
     // menus
@@ -23,7 +42,7 @@ std::map<std::string, std::string> getCommands(){
         std::cout << "Could not parse menus." << std::endl;
         exit(1);
     }
-    cmds["1"] = toString(menus);
+    cmds[0x01] = toString(menus);
 
     // food
     std::vector<Food> food;
@@ -35,13 +54,16 @@ std::map<std::string, std::string> getCommands(){
         std::cout << "Could not parse food." << std::endl;
         exit(1);
     }
-    cmds["2"] = toString(food);
+    cmds[0x02] = toString(food);
+
+    // test
+    cmds[0x03] = fileToString("lorem");
 
     return cmds;
 }
 
 int main(int argc, char const *argv[]) {
-    std::map<std::string, std::string> cmds = getCommands();
+    std::map<uint8_t, std::string> cmds = getCommands();
 
     NfcManager manager;
     if(manager.open()){
@@ -50,12 +72,15 @@ int main(int argc, char const *argv[]) {
 
         while(1){
             while(!manager.isTargetPresent());
-            if(manager.selectApplication("F222222222", response)){
+            APDUResp rapdu;
+            if(manager.selectApplication("F222222222", rapdu)){
+                APDUCmd cmd;
                 while(response!=""){
-                    msg = response + cmds[response];
-                    if(!manager.send(msg, response)){
-                        response = "";
-                    }
+                    std::cout << response << std::endl;
+                    // msg = response + cmds[response];
+                    // if(!manager.send(cmd, response)){
+                    //     response = "";
+                    // }
                 }
             }
             else{

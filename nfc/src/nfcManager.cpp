@@ -33,24 +33,17 @@ void NfcManager::close(){
     nfc_exit(mNfcContext);
 }
 
-std::string NfcManager::getDeviceName(){
-    return nfc_device_get_name(mNfcDevice);
-}
-
-std::string NfcManager::getNfcLibVersion(){
-    return nfc_version();
-}
-
 bool NfcManager::isTargetPresent(){
     nfc_target nfcTarget;
     return (nfc_initiator_select_passive_target(mNfcDevice, mNfcModulation, NULL, 0, &nfcTarget)>0);
 }
 
-bool NfcManager::transceive(std::vector<uint8_t>& apdu, std::string& response){
-    uint8_t *capdu = &apdu[0];
-    size_t capdulen = apdu.size();
-    uint8_t rapdu[MAX_DATA_LENGTH];
-    size_t rapdulen = MAX_DATA_LENGTH;
+bool NfcManager::transceive(const APDUCmd& cmd, APDUResp& resp){
+    std::vector<uint8_t> cmdApdu = cmd.build();
+    uint8_t *capdu = &cmdApdu[0];
+    size_t capdulen = cmdApdu.size();
+    uint8_t rapdu[APDUResp::MAX_APDU_LENGTH];
+    size_t rapdulen = APDUResp::MAX_APDU_LENGTH;
 
     int res = nfc_initiator_transceive_bytes(mNfcDevice, capdu, capdulen, rapdu, rapdulen, 700);
     if(res<0){
@@ -61,23 +54,18 @@ bool NfcManager::transceive(std::vector<uint8_t>& apdu, std::string& response){
         return false;
     }
 
-    response = byteArrayToString(rapdu, 0, res-2);
+    resp.setSW1(0x90);
+    resp.setSW2(0x00);
+    resp.setResponse(rapdu, res-2);
     return true;
 }
 
-bool NfcManager::selectApplication(std::string appId, std::string &response){
-    std::vector<uint8_t> selectApdu = hexStringToByteArray("00A40400");
-    std::vector<uint8_t> appIdHex = hexStringToByteArray(appId);
-    selectApdu.push_back((uint8_t)appIdHex.size());
-    selectApdu.insert(selectApdu.end(), appIdHex.begin(), appIdHex.end());
-    return transceive(selectApdu, response);
-}
-
-bool NfcManager::send(const std::string &message, std::string &response){
-    std::vector<uint8_t> apduCmd(message.begin(), message.end());
-    if(apduCmd.size()>MAX_DATA_LENGTH){
-        std::cout << "Message length is too long!" << std::endl;
-        return false;
-    }
-    return transceive(apduCmd, response);
+bool NfcManager::selectApplication(const std::string& appId, APDUResp& rapdu){
+    APDUCmd capdu;
+    capdu.setClass(0x00);
+    capdu.setInstruction(0xA4);
+    capdu.setParams(0x04, 0x00);
+    capdu.setData(hexStringToByteArray(appId));
+    capdu.setExpectedLength(0);
+    return transceive(capdu, rapdu);
 }

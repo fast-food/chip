@@ -8,10 +8,11 @@
 #include <iostream>
 
 #include "nfcUtils.h"
+#include "apduCmd.h"
+#include "apduResp.h"
 
 class NfcManager {
     private:
-        const size_t MAX_DATA_LENGTH = 65535;
         nfc_context* mNfcContext;
         nfc_device* mNfcDevice;
         nfc_modulation mNfcModulation;
@@ -21,12 +22,9 @@ class NfcManager {
 
         bool open();
         void close();
-        std::string getDeviceName();
-        std::string getNfcLibVersion();
         bool isTargetPresent();
-        bool transceive(std::vector<uint8_t>& apdu, std::string& response);
-        bool selectApplication(std::string appId, std::string &response);
-        bool send(const std::string &message, std::string &response);
+        bool transceive(const APDUCmd& capdu, APDUResp& rapdu);
+        bool selectApplication(const std::string& appId, APDUResp& rapdu);
 };
 
 #endif
