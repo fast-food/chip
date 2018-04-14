@@ -7,25 +7,6 @@
 #include "../nfc/include/nfcManager.h"
 #include "../network/include/network.h"
 
-
-
-#include <sstream>
-#include <fstream>
-std::string fileToString(std::string filename){
-    std::ifstream file(filename.c_str());
-    std::string line;
-    std::stringstream ss;
-    while(!file.eof()){
-        getline(file, line);
-        if(line != ""){
-            ss << line << std::endl;
-        }
-    }
-    file.close();
-    return ss.str();
-}
-
-
 const std::string BASE_URL = "http://127.0.0.1:8080";
 
 std::map<uint8_t, std::string> getCommands(){
@@ -55,10 +36,7 @@ std::map<uint8_t, std::string> getCommands(){
         exit(1);
     }
     cmds[0x02] = toString(food);
-
-    // test
-    cmds[0x03] = fileToString("lorem");
-
+    
     return cmds;
 }
 
