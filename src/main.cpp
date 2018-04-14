@@ -67,20 +67,22 @@ int main(int argc, char const *argv[]) {
 
     NfcManager manager;
     if(manager.open()){
-        std::string response, msg;
         std::cout << "Nfc device opened. Waiting for target..." << std::endl;
 
         while(1){
-            while(!manager.isTargetPresent());
             APDUResp rapdu;
+            APDUCmd capdu;
+
+            while(!manager.isTargetPresent());
             if(manager.selectApplication("F222222222", rapdu)){
-                APDUCmd cmd;
-                while(response!=""){
-                    std::cout << response << std::endl;
-                    // msg = response + cmds[response];
-                    // if(!manager.send(cmd, response)){
-                    //     response = "";
-                    // }
+                std::vector<uint8_t> response = rapdu.getBytesData();
+                while(response.size()!=0){
+                    capdu.setClass(response[0]);
+                    capdu.setData(cmds[response[0]]);
+                    if(!manager.transceive(capdu, rapdu)){
+                        break;
+                    }
+                    response = rapdu.getBytesData();
                 }
             }
             else{

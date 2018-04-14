@@ -13,13 +13,13 @@ void APDUResp::setSW2(const uint8_t& SW2){
     mSW2 = SW2;
 }
 
-void APDUResp::setResponse(const std::string& response){
+void APDUResp::setData(const std::string& response){
     size_t length = response.size();
     assert(length <= MAX_RESP_LENGTH);
     mResp = std::vector<uint8_t>(response.begin(), response.end());
 }
 
-void APDUResp::setResponse(const uint8_t* resp, const size_t& length){
+void APDUResp::setData(const uint8_t* resp, const size_t& length){
     std::string response = byteArrayToString(resp, 0, length);
     mResp = std::vector<uint8_t>(response.begin(), response.end());
 }
@@ -32,10 +32,12 @@ uint8_t APDUResp::getSW2() const{
     return mSW2;
 }
 
-std::string APDUResp::getResponse() const{
-    std::vector<uint8_t> apdu = build();
-    size_t length = apdu.size();
-    return length>2?byteArrayToString(&apdu[0], 0, length-2):"";
+std::string APDUResp::getStringData() const{
+    return byteArrayToString(&mResp[0], 0, mResp.size());
+}
+
+std::vector<uint8_t> APDUResp::getBytesData() const{
+    return mResp;
 }
 
 std::vector<uint8_t> APDUResp::build() const{

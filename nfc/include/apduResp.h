@@ -20,12 +20,13 @@ class APDUResp {
 
         void setSW1(const uint8_t& SW1);
         void setSW2(const uint8_t& SW2);
-        void setResponse(const std::string& response);
-        void setResponse(const uint8_t* resp, const size_t& length);
+        void setData(const std::string& response);
+        void setData(const uint8_t* resp, const size_t& length);
 
         uint8_t getSW1() const;
         uint8_t getSW2() const;
-        std::string getResponse() const;
+        std::string getStringData() const;
+        std::vector<uint8_t> getBytesData() const;
 
         std::vector<uint8_t> build() const;
 

@@ -56,7 +56,7 @@ bool NfcManager::transceive(const APDUCmd& cmd, APDUResp& resp){
 
     resp.setSW1(0x90);
     resp.setSW2(0x00);
-    resp.setResponse(rapdu, res-2);
+    resp.setData(rapdu, res-2);
     return true;
 }
 
@@ -66,6 +66,7 @@ bool NfcManager::selectApplication(const std::string& appId, APDUResp& rapdu){
     capdu.setInstruction(0xA4);
     capdu.setParams(0x04, 0x00);
     capdu.setData(hexStringToByteArray(appId));
+    capdu.updateDataLength();
     capdu.setExpectedLength(0);
     return transceive(capdu, rapdu);
 }

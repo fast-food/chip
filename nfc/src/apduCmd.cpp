@@ -24,17 +24,17 @@ void APDUCmd::setData(const std::string& data){
     size_t length = data.size();
     assert(length <= MAX_CMD_LENGTH);
     mData = std::vector<uint8_t>(data.begin(), data.end());
-    setCommandLength();
+    updateDataLength();
 }
 
 void APDUCmd::setData(const std::vector<uint8_t>& data){
     size_t length = data.size();
     assert(length <= MAX_CMD_LENGTH);
     mData = std::vector<uint8_t>(data.begin(), data.end());
-    setCommandLength();
+    updateDataLength();
 }
 
-void APDUCmd::setCommandLength(){
+void APDUCmd::updateDataLength(){
     size_t length = mData.size();
     std::vector<uint8_t> lBytes = intToBytes(length);
     if(length==0){
@@ -73,9 +73,12 @@ std::vector<uint8_t> APDUCmd::getParams() const{
     return mParams;
 }
 
-std::string APDUCmd::getData() const{
-    std::vector<uint8_t> apdu = build();
-    return byteArrayToString(&apdu[0], 0, apdu.size());
+std::string APDUCmd::getStringData() const{
+    return byteArrayToString(&mData[0], 0, mData.size());
+}
+
+std::vector<uint8_t> APDUCmd::getBytesData() const{
+    return mData;
 }
 
 std::vector<uint8_t> APDUCmd::build() const{
