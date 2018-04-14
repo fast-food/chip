@@ -48,19 +48,19 @@ int main(int argc, char const *argv[]) {
         std::cout << "Nfc device opened. Waiting for target..." << std::endl;
 
         while(1){
-            APDUResp rapdu;
-            APDUCmd capdu;
+            APDU apdu;
 
             while(!manager.isTargetPresent());
-            if(manager.selectApplication("F222222222", rapdu)){
-                std::vector<uint8_t> response = rapdu.getBytesData();
+            if(manager.selectApplication("F222222222", apdu)){
+                std::vector<uint8_t> response = apdu.getRespBytes();
                 while(response.size()!=0){
-                    capdu.setClass(response[0]);
-                    capdu.setData(cmds[response[0]]);
-                    if(!manager.transceive(capdu, rapdu)){
+                    apdu.reset();
+                    apdu.setClass(response[0]);
+                    apdu.setCmd(cmds[response[0]]);
+                    if(!manager.transceive(apdu)){
                         break;
                     }
-                    response = rapdu.getBytesData();
+                    response = apdu.getRespBytes();
                 }
             }
             else{
