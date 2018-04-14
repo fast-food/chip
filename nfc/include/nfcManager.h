@@ -1,15 +1,12 @@
 #ifndef COMMUNICATOR
 #define COMMUNICATOR
 
-#include <stdlib.h>
-#include <string.h>
-#include <nfc/nfc.h>
+#include <cstdlib>
+#include <string>
 #include <vector>
-#include <iostream>
+#include <nfc/nfc.h>
 
-#include "nfcUtils.h"
-#include "apduCmd.h"
-#include "apduResp.h"
+#include "apdu.h"
 
 class NfcManager {
     private:
@@ -23,8 +20,8 @@ class NfcManager {
         bool open();
         void close();
         bool isTargetPresent();
-        bool transceive(const APDUCmd& capdu, APDUResp& rapdu);
-        bool selectApplication(const std::string& appId, APDUResp& rapdu);
+        bool transceive(APDU& apdu);
+        bool selectApplication(const std::string& appId, APDU& apdu);
 };
 
 #endif
