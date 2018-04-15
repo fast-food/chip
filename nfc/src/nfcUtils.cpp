@@ -23,6 +23,15 @@ std::vector<uint8_t> hexStringToByteArray(const std::string& str) {
     return hex;
 }
 
+std::vector<uint8_t> intToBytes(const size_t& value){
+    std::vector<uint8_t> result;
+    result.push_back(value >> 24);
+    result.push_back(value >> 16);
+    result.push_back(value >>  8);
+    result.push_back(value);
+    return result;
+}
+
 void print(const std::vector<uint8_t>& v) {
     for(int i=0 ; i<v.size() ; i++){
         printf("%.2X", v[i]);

@@ -2,8 +2,6 @@
 #include <unistd.h>
 #include <map>
 
-#include "../food/include/menuUtils.h"
-#include "../food/include/foodUtils.h"
 #include "../nfc/include/nfcManager.h"
 #include "../network/include/network.h"
 
@@ -14,28 +12,18 @@ std::map<uint8_t, std::string> getCommands(){
     std::string json;
 
     // menus
-    std::vector<Menu> menus;
     if(!requestUri(BASE_URL, "/menu", json)){
         std::cout << "Could not get menus from server." << std::endl;
         exit(1);
     }
-    if(!parseMenus(json, menus)){
-        std::cout << "Could not parse menus." << std::endl;
-        exit(1);
-    }
-    cmds[0x01] = toString(menus);
+    cmds[0x01] = json;
 
     // food
-    std::vector<Food> food;
     if(!requestUri(BASE_URL, "/food", json)){
         std::cout << "Could not get food from server." << std::endl;
         exit(1);
     }
-    if(!parseFood(json, food)){
-        std::cout << "Could not parse food." << std::endl;
-        exit(1);
-    }
-    cmds[0x02] = toString(food);
+    cmds[0x02] = json;
 
     return cmds;
 }
@@ -49,19 +37,48 @@ int main(int argc, char const *argv[]) {
 
         while(1){
             APDU apdu;
-            apdu.setExtended(true);
 
             while(!manager.isTargetPresent());
             if(manager.selectApplication("F222222222", apdu)){
                 std::vector<uint8_t> response = apdu.getRespBytes();
                 while(response.size()!=0){
-                    apdu.reset();
-                    apdu.setClass(response[0]);
-                    apdu.setCmd(cmds[response[0]]);
-                    if(!manager.transceive(apdu)){
-                        break;
+                    uint8_t code = response[0];
+                    std::string msg = cmds[response[0]];
+                    size_t msgLength = msg.size();
+                    size_t maxLength = apdu.getCmdMaxLength();
+
+                    if(msgLength <= maxLength){
+                        apdu.reset();
+                        apdu.setClass(code);
+                        apdu.setCmd(msg);
+                        if(!manager.transceive(apdu)){
+                            break;
+                        }
+                        response = apdu.getRespBytes();
                     }
-                    response = apdu.getRespBytes();
+                    else{
+                        int q = msgLength/maxLength;
+                        int r = msgLength%maxLength;
+                        // send q messages of length maxLength
+                        for(unsigned int i=0 ; i<q ; i++){
+                            apdu.reset();
+                            apdu.setClass(code);
+                            apdu.setInstruction(0x01);
+                            apdu.setCmd(msg.substr(i*maxLength, maxLength));
+                            if(!manager.transceive(apdu)){
+                                break;
+                            }
+                        }
+                        // send 1 message of length r
+                        apdu.reset();
+                        apdu.setClass(code);
+                        apdu.setInstruction(0x02);
+                        apdu.setCmd(msg.substr(q*maxLength, r));
+                        if(!manager.transceive(apdu)){
+                            break;
+                        }
+                        response = apdu.getRespBytes();
+                    }
                 }
             }
             else{

@@ -1,24 +1,12 @@
 CC = g++
 ODIR = obj
 PROG = main
-CXXFLAG = -std=c++11 -lcurl -ljsoncpp -lnfc
+CXXFLAG = -std=c++11 -lcurl -lnfc
 
-$(PROG) : $(ODIR) $(ODIR)/network.o $(ODIR)/menuUtils.o $(ODIR)/food.o $(ODIR)/menu.o $(ODIR)/foodUtils.o $(ODIR)/apdu.o $(ODIR)/nfcManager.o $(ODIR)/nfcUtils.o $(ODIR)/main.o
-	$(CC) -o $@ $(ODIR)/network.o $(ODIR)/menuUtils.o $(ODIR)/food.o $(ODIR)/menu.o $(ODIR)/foodUtils.o $(ODIR)/apdu.o $(ODIR)/nfcManager.o $(ODIR)/nfcUtils.o $(ODIR)/main.o $(CXXFLAG)
+$(PROG) : $(ODIR) $(ODIR)/network.o $(ODIR)/apdu.o $(ODIR)/nfcManager.o $(ODIR)/apduCmd.o $(ODIR)/nfcUtils.o $(ODIR)/main.o
+	$(CC) -o $@ $(ODIR)/network.o $(ODIR)/apdu.o $(ODIR)/nfcManager.o $(ODIR)/apduCmd.o $(ODIR)/nfcUtils.o $(ODIR)/main.o $(CXXFLAG)
 
 $(ODIR)/network.o : ./network/src/network.cpp ./network/include/network.h
-	$(CC) -c $< -o $@ $(CXXFLAG)
-
-$(ODIR)/menuUtils.o : ./food/src/menuUtils.cpp ./food/include/menuUtils.h ./food/include/menu.h ./food/include/food.h ./food/include/foodType.h
-	$(CC) -c $< -o $@ $(CXXFLAG)
-
-$(ODIR)/food.o : ./food/src/food.cpp ./food/include/food.h ./food/include/foodType.h
-	$(CC) -c $< -o $@ $(CXXFLAG)
-
-$(ODIR)/menu.o : ./food/src/menu.cpp ./food/include/menu.h ./food/include/food.h ./food/include/foodType.h
-	$(CC) -c $< -o $@ $(CXXFLAG)
-
-$(ODIR)/foodUtils.o : ./food/src/foodUtils.cpp ./food/include/foodUtils.h ./food/include/food.h ./food/include/foodType.h
 	$(CC) -c $< -o $@ $(CXXFLAG)
 
 $(ODIR)/apdu.o : ./nfc/src/apdu.cpp ./nfc/include/apdu.h ./nfc/include/nfcUtils.h
@@ -27,10 +15,13 @@ $(ODIR)/apdu.o : ./nfc/src/apdu.cpp ./nfc/include/apdu.h ./nfc/include/nfcUtils.
 $(ODIR)/nfcManager.o : ./nfc/src/nfcManager.cpp ./nfc/include/nfcManager.h ./nfc/include/apdu.h ./nfc/include/nfcUtils.h
 	$(CC) -c $< -o $@ $(CXXFLAG)
 
+$(ODIR)/apduCmd.o : ./nfc/src/apduCmd.cpp
+	$(CC) -c $< -o $@ $(CXXFLAG)
+
 $(ODIR)/nfcUtils.o : ./nfc/src/nfcUtils.cpp ./nfc/include/nfcUtils.h
 	$(CC) -c $< -o $@ $(CXXFLAG)
 
-$(ODIR)/main.o : ./src/main.cpp ./food/include/menuUtils.h ./food/include/foodUtils.h ./nfc/include/nfcManager.h ./network/include/network.h
+$(ODIR)/main.o : ./src/main.cpp ./nfc/include/nfcManager.h ./network/include/network.h
 	$(CC) -c $< -o $@ $(CXXFLAG)
 
 $(ODIR) :

@@ -1,6 +1,7 @@
 #include "../include/apdu.h"
 
 APDU::APDU(){
+    mExtended = false;
     reset();
 }
 
@@ -15,7 +16,7 @@ void APDU::reset(){
     mSW2 = '\x00';
     mResp = {};
 
-    setExtended(false);
+    setExtended(mExtended);
 }
 
 void APDU::setClass(const uint8_t& cla){
@@ -177,13 +178,4 @@ size_t APDU::getCmdMaxLength() const{
 
 size_t APDU::getRespMaxLength() const{
     return mRespMaxLength;
-}
-
-std::vector<uint8_t> APDU::intToBytes(const size_t& value){
-    std::vector<uint8_t> result;
-    result.push_back(value >> 24);
-    result.push_back(value >> 16);
-    result.push_back(value >>  8);
-    result.push_back(value);
-    return result;
 }

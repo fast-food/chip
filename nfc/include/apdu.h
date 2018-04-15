@@ -29,8 +29,6 @@ class APDU {
         size_t mCmdMaxLength;
         size_t mRespMaxLength;
 
-        std::vector<uint8_t> intToBytes(const size_t& value);
-
     public:
         APDU();
         void reset();
