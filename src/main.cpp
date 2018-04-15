@@ -57,21 +57,21 @@ int main(int argc, char const *argv[]) {
                         response = apdu.getRespBytes();
                     }
                     else{
+                        apdu.reset();
+                        apdu.setClass(code);
                         int q = msgLength/maxLength;
                         int r = msgLength%maxLength;
+
                         // send q messages of length maxLength
+                        apdu.setInstruction(0x01);
                         for(unsigned int i=0 ; i<q ; i++){
-                            apdu.reset();
-                            apdu.setClass(code);
-                            apdu.setInstruction(0x01);
                             apdu.setCmd(msg.substr(i*maxLength, maxLength));
                             if(!manager.transceive(apdu)){
                                 break;
                             }
                         }
+
                         // send 1 message of length r
-                        apdu.reset();
-                        apdu.setClass(code);
                         apdu.setInstruction(0x02);
                         apdu.setCmd(msg.substr(q*maxLength, r));
                         if(!manager.transceive(apdu)){
