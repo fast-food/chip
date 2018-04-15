@@ -42,8 +42,8 @@ bool NfcManager::transceive(APDU& apdu){
     std::vector<uint8_t> cmdApdu = apdu.buildCmd();
     uint8_t *capdu = &cmdApdu[0];
     size_t capdulen = cmdApdu.size();
-    uint8_t rapdu[APDU::MAX_RESP_APDU_LENGTH];
-    size_t rapdulen = APDU::MAX_RESP_APDU_LENGTH;
+    uint8_t rapdu[apdu.getRespMaxLength()];
+    size_t rapdulen = apdu.getRespMaxLength();
 
     int res = nfc_initiator_transceive_bytes(mNfcDevice, capdu, capdulen, rapdu, rapdulen, 700);
     if(res<0){
@@ -65,7 +65,5 @@ bool NfcManager::selectApplication(const std::string& appId, APDU& apdu){
     apdu.setInstruction(0xA4);
     apdu.setParams(0x04, 0x00);
     apdu.setCmd(hexStringToByteArray(appId));
-    apdu.updateCmdLength();
-    apdu.setExpectedRespLength(0);
     return transceive(apdu);
 }

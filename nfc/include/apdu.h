@@ -17,13 +17,19 @@ class APDU {
         std::vector<uint8_t> mLc;
         std::vector<uint8_t> mCmd;
         std::vector<uint8_t> mLe;
+        size_t mExpectedRespLength;
 
         // response
         uint8_t mSW1;
         uint8_t mSW2;
         std::vector<uint8_t> mResp;
 
-        std::vector<uint8_t> intToBytes(const int& value);
+        // extended apdu
+        bool mExtended;
+        size_t mCmdMaxLength;
+        size_t mRespMaxLength;
+
+        std::vector<uint8_t> intToBytes(const size_t& value);
 
     public:
         APDU();
@@ -35,7 +41,7 @@ class APDU {
         void setParams(const uint8_t& p1, const uint8_t& p2);
         void setCmd(const std::string& data);
         void setCmd(const std::vector<uint8_t>& data);
-        void setExpectedRespLength(const int& length);
+        void setExpectedRespLength(const size_t& length);
         void updateCmdLength();
 
         uint8_t getClass() const;
@@ -43,6 +49,7 @@ class APDU {
         std::vector<uint8_t> getParams() const;
         std::string getCmdString() const;
         std::vector<uint8_t> getCmdBytes() const;
+        size_t getExpectedRespLength() const;
         std::vector<uint8_t> buildCmd() const;
 
         // response
@@ -57,11 +64,11 @@ class APDU {
         std::vector<uint8_t> getRespBytes() const;
         std::vector<uint8_t> buildResp() const;
 
-        // constants
-        static const size_t MAX_CMD_LENGTH = 255;
-        static const size_t MAX_CMD_APDU_LENGTH = MAX_CMD_LENGTH + 6;
-        static const size_t MAX_RESP_LENGTH = MAX_CMD_LENGTH + 1;
-        static const size_t MAX_RESP_APDU_LENGTH = MAX_RESP_LENGTH + 6;
+        // extended apdu
+        void setExtended(bool enabled);
+        bool isExtended() const;
+        size_t getCmdMaxLength() const;
+        size_t getRespMaxLength() const;
 };
 
 #endif

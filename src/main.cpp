@@ -36,7 +36,7 @@ std::map<uint8_t, std::string> getCommands(){
         exit(1);
     }
     cmds[0x02] = toString(food);
-    
+
     return cmds;
 }
 
@@ -49,6 +49,7 @@ int main(int argc, char const *argv[]) {
 
         while(1){
             APDU apdu;
+            apdu.setExtended(true);
 
             while(!manager.isTargetPresent());
             if(manager.selectApplication("F222222222", apdu)){

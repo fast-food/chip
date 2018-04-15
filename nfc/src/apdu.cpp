@@ -8,13 +8,14 @@ void APDU::reset(){
     mCla = '\x00';
     mIns = '\x00';
     mParams = {'\x00', '\x00'};
-    mLc = {'\x00'};
+    mLc = {};
     mCmd = {};
-    mLe = {};
 
     mSW1 = '\x00';
     mSW2 = '\x00';
     mResp = {};
+
+    setExtended(false);
 }
 
 void APDU::setClass(const uint8_t& cla){
@@ -32,14 +33,14 @@ void APDU::setParams(const uint8_t& p1, const uint8_t& p2){
 
 void APDU::setCmd(const std::string& data){
     size_t length = data.size();
-    assert(length <= MAX_CMD_LENGTH);
+    assert(length <= mCmdMaxLength);
     mCmd = std::vector<uint8_t>(data.begin(), data.end());
     updateCmdLength();
 }
 
 void APDU::setCmd(const std::vector<uint8_t>& data){
     size_t length = data.size();
-    assert(length <= MAX_CMD_LENGTH);
+    assert(length <= mCmdMaxLength);
     mCmd = std::vector<uint8_t>(data.begin(), data.end());
     updateCmdLength();
 }
@@ -50,22 +51,33 @@ void APDU::updateCmdLength(){
     if(length==0){
         mLc = {};
     }
-    else if(length<=MAX_CMD_LENGTH){
+    else if(length <= 255){
         mLc = {lBytes[3]};
+    }
+    else if(length <= 65535){
+        mLc = {'\x00', lBytes[2], lBytes[3]};
     }
 }
 
-void APDU::setExpectedRespLength(const int& length){
-    assert(length <= MAX_CMD_LENGTH+1);
+void APDU::setExpectedRespLength(const size_t& length){
+    assert(length <= mRespMaxLength);
     std::vector<uint8_t> lBytes = intToBytes(length);
+    mExpectedRespLength = length;
+
     if(length==0){
         mLe = {};
     }
-    else if(length<=MAX_CMD_LENGTH){
+    else if(length <= 255){
         mLe = {lBytes[3]};
     }
-    else if(length==MAX_CMD_LENGTH+1){
+    else if(length==256){
         mLe = {'\x00'};
+    }
+    else if(length <= 65535){
+        mLe = {lBytes[2], lBytes[3]};
+    }
+    else if(length <= 65536){
+        mLe = {'\x00', '\x00'};
     }
 }
 
@@ -89,6 +101,10 @@ std::vector<uint8_t> APDU::getCmdBytes() const{
     return mCmd;
 }
 
+size_t APDU::getExpectedRespLength() const{
+    return mExpectedRespLength;
+}
+
 std::vector<uint8_t> APDU::buildCmd() const{
     std::vector<uint8_t> apdu;
     apdu.push_back(mCla);
@@ -110,7 +126,7 @@ void APDU::setSW2(const uint8_t& SW2){
 
 void APDU::setResp(const std::string& response){
     size_t length = response.size();
-    assert(length <= MAX_RESP_LENGTH);
+    assert(length <= mRespMaxLength);
     mResp = std::vector<uint8_t>(response.begin(), response.end());
 }
 
@@ -143,7 +159,27 @@ std::vector<uint8_t> APDU::buildResp() const{
     return apdu;
 }
 
-std::vector<uint8_t> APDU::intToBytes(const int& value){
+void APDU::setExtended(bool enabled){
+    mExtended = enabled;
+    mCmdMaxLength = enabled?65535:255;
+    mRespMaxLength = enabled?65536:256;
+    mExpectedRespLength = mRespMaxLength;
+    mLe = std::vector<uint8_t>(enabled?2:1, '\x00');
+}
+
+bool APDU::isExtended() const{
+    return mExtended;
+}
+
+size_t APDU::getCmdMaxLength() const{
+    return mCmdMaxLength;
+}
+
+size_t APDU::getRespMaxLength() const{
+    return mRespMaxLength;
+}
+
+std::vector<uint8_t> APDU::intToBytes(const size_t& value){
     std::vector<uint8_t> result;
     result.push_back(value >> 24);
     result.push_back(value >> 16);
