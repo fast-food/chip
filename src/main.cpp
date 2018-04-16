@@ -12,6 +12,7 @@ int main(int argc, char const *argv[]) {
         while(1){
             APDU apdu;
             std::string json;
+            bool interrupted = false;
 
             while(!manager.isTargetPresent());
             if(manager.selectApplication("F222222222", apdu)){
@@ -29,6 +30,7 @@ int main(int argc, char const *argv[]) {
                         apdu.reset();
                         apdu.setCmd(json);
                         if(!manager.transceive(apdu)){
+                            interrupted = true;
                             break;
                         }
                         response = apdu.getRespBytes();
@@ -43,6 +45,7 @@ int main(int argc, char const *argv[]) {
                         for(unsigned int i=0 ; i<q ; i++){
                             apdu.setCmd(json.substr(i*maxLength, maxLength));
                             if(!manager.transceive(apdu)){
+                                interrupted = true;
                                 break;
                             }
                         }
@@ -51,6 +54,7 @@ int main(int argc, char const *argv[]) {
                         apdu.setParams(0x02, 0x00);
                         apdu.setCmd(json.substr(q*maxLength, r));
                         if(!manager.transceive(apdu)){
+                            interrupted = true;
                             break;
                         }
                         response = apdu.getRespBytes();
@@ -58,7 +62,11 @@ int main(int argc, char const *argv[]) {
                 }
             }
             else{
-                std::cout << "select error" << std::endl;
+                interrupted = true;
+            }
+
+            if(interrupted){
+                std::cout << "Connection interrupted. Please try again." << std::endl;
             }
         }
 
