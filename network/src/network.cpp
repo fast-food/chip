@@ -13,6 +13,8 @@ bool request(const std::string& url, std::string& result){
     CURLcode res;
     long http_code = 0;
 
+    SERVER_DATA = "";
+
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeCallback);
     curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
@@ -31,16 +33,4 @@ bool request(const std::string& url, std::string& result){
         result = "";
         return false;
     }
-}
-
-bool requestUri(const std::string& baseUrl, const std::string& uri, std::string& jsonStr){
-    std::string serverAddr = baseUrl + uri;
-    jsonStr = "";
-    SERVER_DATA = "";
-    std::string response;
-    if(request(serverAddr, response)){
-        jsonStr = response;
-        return true;
-    }
-    return false;
 }
