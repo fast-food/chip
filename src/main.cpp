@@ -4,6 +4,7 @@
 #include "../network/include/network.h"
 
 int main(int argc, char const *argv[]) {
+    Network network;
     NfcManager manager;
     if(manager.open()){
         std::cout << "Nfc device opened. Waiting for target..." << std::endl;
@@ -17,7 +18,7 @@ int main(int argc, char const *argv[]) {
                 std::vector<uint8_t> response = apdu.getRespBytes();
                 while(response.size()!=0){
                     std::string url = apdu.getRespString();
-                    if(!request(url, json)){
+                    if(!network.request(url, json)){
                         std::cout << "Could not request: " << url << std::endl;
                         break;
                     }

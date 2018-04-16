@@ -1,32 +1,38 @@
 #include "../include/network.h"
 
-size_t writeCallback(char* buf, size_t size, size_t nmemb, void* up){
-    for (int c = 0; c<size*nmemb; c++)
-    {
-        SERVER_DATA.push_back(buf[c]);
+Network::Network(){
+    mCurl = curl_easy_init();
+    mServerData = "";
+}
+
+Network::~Network(){
+    curl_easy_cleanup(mCurl);
+    curl_global_cleanup();
+}
+
+size_t Network::writeCallback(char* buf, size_t size, size_t nmemb, void* userdata){
+    for (int c = 0; c<size*nmemb; c++){
+        mServerData.push_back(buf[c]);
     }
     return size*nmemb;
 }
 
-bool request(const std::string& url, std::string& result){
-    CURL* curl = curl_easy_init();
+bool Network::request(const std::string& url, std::string& result){
     CURLcode res;
     long http_code = 0;
+    mServerData = "";
 
-    SERVER_DATA = "";
-
-    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, &writeCallback);
-    curl_easy_setopt(curl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
-    curl_easy_setopt(curl, CURLOPT_TIMEOUT, 10);
-    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-    res = curl_easy_perform(curl);
-    curl_easy_getinfo (curl, CURLINFO_RESPONSE_CODE, &http_code);
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
+    curl_easy_setopt(mCurl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(mCurl, CURLOPT_WRITEFUNCTION, Network::writeCallbackStatic);
+    curl_easy_setopt(mCurl, CURLOPT_WRITEDATA, this);
+    curl_easy_setopt(mCurl, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4);
+    curl_easy_setopt(mCurl, CURLOPT_TIMEOUT, 10);
+    curl_easy_setopt(mCurl, CURLOPT_FOLLOWLOCATION, 1L);
+    res = curl_easy_perform(mCurl);
+    curl_easy_getinfo (mCurl, CURLINFO_RESPONSE_CODE, &http_code);
 
     if (res==CURLE_OK && http_code==200){
-        result = SERVER_DATA;
+        result = mServerData;
         return true;
     }
     else{

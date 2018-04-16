@@ -1,16 +1,23 @@
 #ifndef NETWORK
 #define NETWORK
 
-#include <iostream>
-#include <vector>
-
+#include <string>
 #include <curl/curl.h>
 
-static std::string SERVER_DATA;
+class Network {
+    private:
+        CURL* mCurl;
+        std::string mServerData;
 
-size_t writeCallback(char* buf, size_t size, size_t nmemb, void* up);
-bool request(const std::string& url, std::string& result);
-bool getFoodFromServer(const std::string& baseUrl, std::string& jsonStr);
-bool getMenusFromServer(const std::string& baseUrl, std::string& jsonStr);
+        size_t writeCallback(char* buf, size_t size, size_t nmemb, void* userdata);
+        static size_t writeCallbackStatic(char* buf, size_t size, size_t nmemb, void* userdata){
+            return ((Network*)userdata)->writeCallback(buf, size, nmemb, userdata);
+        }
+
+    public:
+        Network();
+        ~Network();
+        bool request(const std::string& url, std::string& result);
+};
 
 #endif
