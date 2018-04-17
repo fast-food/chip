@@ -51,6 +51,8 @@ bool NfcManager::transceive(APDU& apdu){
     }
 
     if(res<2 || rapdu[res-2] != 0x90 || rapdu[res-1] != 0x00){
+        apdu.setSW1(rapdu[res-2]);
+        apdu.setSW2(rapdu[res-1]);
         return false;
     }
 
