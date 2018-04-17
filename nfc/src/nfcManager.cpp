@@ -46,11 +46,11 @@ bool NfcManager::transceive(APDU& apdu){
     size_t rapdulen = apdu.getRespMaxLength();
 
     int res = nfc_initiator_transceive_bytes(mNfcDevice, capdu, capdulen, rapdu, rapdulen, 700);
-    if(res<0){
+    if(res<2){
         return false;
     }
 
-    if(res<2 || rapdu[res-2] != 0x90 || rapdu[res-1] != 0x00){
+    if(rapdu[res-2] != 0x90 || rapdu[res-1] != 0x00){
         apdu.setSW1(rapdu[res-2]);
         apdu.setSW2(rapdu[res-1]);
         return false;
