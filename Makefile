@@ -1,7 +1,7 @@
 CC = g++
 ODIR = obj
 PROG = main
-CXXFLAG = -std=c++11 -lcurl -lnfc
+CXXFLAG = -std=c++11 -lcurl -lnfc -ljsoncpp
 
 $(PROG) : $(ODIR) $(ODIR)/network.o $(ODIR)/apdu.o $(ODIR)/nfcManager.o $(ODIR)/nfcUtils.o $(ODIR)/main.o
 	$(CC) -o $@ $(ODIR)/network.o $(ODIR)/apdu.o $(ODIR)/nfcManager.o $(ODIR)/nfcUtils.o $(ODIR)/main.o $(CXXFLAG)

@@ -1,7 +1,24 @@
 #include <iostream>
+#include <jsoncpp/json/json.h>
 
 #include "../nfc/include/nfcManager.h"
+#include "../nfc/include/nfcRequest.h"
 #include "../network/include/network.h"
+
+bool parseNfcRequest(const std::string& json, NfcRequest& request){
+    Json::Value root;
+    Json::Reader reader;
+    bool parsingSuccessful = ;
+    if (reader.parse(json.c_str(), root)){
+        request.setType(root.get("type", 0).asInt());
+        request.setUrl(root.get("url", "").asString());
+
+        // std::cout << root.get("mykey", "A Default Value if not exists" ).asString() << std::endl;
+        return true;
+    }
+    std::cout << "Failed to parse request : " << reader.getFormattedErrorMessages();
+    return false;
+}
 
 int main(int argc, char const *argv[]) {
     Network network;
@@ -19,10 +36,13 @@ int main(int argc, char const *argv[]) {
                 std::vector<uint8_t> response = apdu.getRespBytes();
                 while(response.size()!=0){
                     std::string url = apdu.getRespString();
+                    std::cout << "received: " << url << std::endl;
+
                     if(!network.request(url, json)){
                         std::cout << "Could not request: " << url << std::endl;
                         break;
                     }
+
                     size_t msgLength = json.size();
                     size_t maxLength = apdu.getCmdMaxLength();
 
