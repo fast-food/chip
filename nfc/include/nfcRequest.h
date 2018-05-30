@@ -17,7 +17,7 @@ class NfcRequest {
 
         int getType() const;
         std::string getUrl() const;
-        std::vector<std::pair<std::string, std::string> > getDatas() const;
+        std::vector<std::pair<std::string, std::string> > getData() const;
 
         void addData(std::string key, std::string value);
         void resetData();

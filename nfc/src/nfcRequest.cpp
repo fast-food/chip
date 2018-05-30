@@ -18,7 +18,7 @@ std::string NfcRequest::getUrl() const{
     return mUrl;
 }
 
-std::vector<std::pair<std::string, std::string> > NfcRequest::getDatas() const{
+std::vector<std::pair<std::string, std::string> > NfcRequest::getData() const{
     return mData;
 }
 

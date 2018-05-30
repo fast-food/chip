@@ -8,21 +8,23 @@
 bool parseNfcRequest(const std::string& json, NfcRequest& request){
     Json::Value root;
     Json::Reader reader;
-    bool parsingSuccessful = ;
     if (reader.parse(json.c_str(), root)){
-        request.setType(root.get("type", 0).asInt());
-        request.setUrl(root.get("url", "").asString());
-
-        // std::cout << root.get("mykey", "A Default Value if not exists" ).asString() << std::endl;
+        request.setType(root["type"].asInt());
+        request.setUrl(root["url"].asString());
+        for(const auto& obj : root["data"]){
+            request.addData(obj["key"].asString(), obj["value"].asString());
+        }
         return true;
     }
     std::cout << "Failed to parse request : " << reader.getFormattedErrorMessages();
     return false;
 }
 
-int main(int argc, char const *argv[]) {
+int main() {
     Network network;
     NfcManager manager;
+    NfcRequest nfcRequest;
+
     if(manager.open()){
         std::cout << "Nfc device opened. Waiting for target..." << std::endl;
 
@@ -35,9 +37,13 @@ int main(int argc, char const *argv[]) {
             if(manager.selectApplication("F222222222", apdu)){
                 std::vector<uint8_t> response = apdu.getRespBytes();
                 while(response.size()!=0){
-                    std::string url = apdu.getRespString();
-                    std::cout << "received: " << url << std::endl;
+                    std::string received = apdu.getRespString();
+                    if(!parseNfcRequest(received, nfcRequest)){
+                        std::cout << "Could not parse json : " << received << std::endl;
+                        break;
+                    }
 
+                    std::string url = nfcRequest.getUrl();
                     if(!network.request(url, json)){
                         std::cout << "Could not request: " << url << std::endl;
                         break;
@@ -62,7 +68,7 @@ int main(int argc, char const *argv[]) {
                         // send q messages of length maxLength
                         apdu.reset();
                         apdu.setParams(0x01, 0x00);
-                        for(unsigned int i=0 ; i<q ; i++){
+                        for(int i=0 ; i<q ; i++){
                             apdu.setCmd(json.substr(i*maxLength, maxLength));
                             if(!manager.transceive(apdu)){
                                 interrupted = true;
