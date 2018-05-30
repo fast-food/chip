@@ -1,9 +1,9 @@
-# FF3
+# Fast-Food Chip
 
 ## Download & Compile
 
 ```
-git clone https://github.com/fast-food/ff3-chip.git
-cd FF3
+git clone https://github.com/fast-food/chip.git
+cd chip
 make
 ```
