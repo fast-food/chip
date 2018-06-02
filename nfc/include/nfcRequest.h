@@ -23,6 +23,9 @@ class NfcRequest {
         void resetData();
         void setUrl(std::string url);
         void setType(int type);
+
+        static const int GET = 0;
+        static const int POST = 1;
 };
 
 #endif

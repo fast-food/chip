@@ -43,42 +43,54 @@ int main() {
                         break;
                     }
 
-                    std::string url = nfcRequest.getUrl();
-                    if(!network.request(url, json)){
-                        std::cout << "Could not request: " << url << std::endl;
-                        break;
-                    }
-
-                    size_t msgLength = json.size();
-                    size_t maxLength = apdu.getCmdMaxLength();
-
-                    if(msgLength <= maxLength){
-                        apdu.reset();
-                        apdu.setCmd(json);
-                        if(!manager.transceive(apdu)){
-                            interrupted = true;
+                    if(nfcRequest.getType()==NfcRequest::GET){
+                        std::string url = nfcRequest.getUrl();
+                        if(!network.request(url, json)){
+                            std::cout << "Could not request: " << url << std::endl;
                             break;
                         }
-                        response = apdu.getRespBytes();
-                    }
-                    else{
-                        int q = msgLength/maxLength;
-                        int r = msgLength%maxLength;
 
-                        // send q messages of length maxLength
-                        apdu.reset();
-                        apdu.setParams(0x01, 0x00);
-                        for(int i=0 ; i<q ; i++){
-                            apdu.setCmd(json.substr(i*maxLength, maxLength));
+                        size_t msgLength = json.size();
+                        size_t maxLength = apdu.getCmdMaxLength();
+
+                        if(msgLength <= maxLength){
+                            apdu.reset();
+                            apdu.setCmd(json);
                             if(!manager.transceive(apdu)){
                                 interrupted = true;
                                 break;
                             }
+                            response = apdu.getRespBytes();
                         }
+                        else{
+                            int q = msgLength/maxLength;
+                            int r = msgLength%maxLength;
 
-                        // send 1 message of length r
-                        apdu.setParams(0x02, 0x00);
-                        apdu.setCmd(json.substr(q*maxLength, r));
+                            // send q messages of length maxLength
+                            apdu.reset();
+                            apdu.setParams(0x01, 0x00);
+                            for(int i=0 ; i<q ; i++){
+                                apdu.setCmd(json.substr(i*maxLength, maxLength));
+                                if(!manager.transceive(apdu)){
+                                    interrupted = true;
+                                    break;
+                                }
+                            }
+
+                            // send 1 message of length r
+                            apdu.setParams(0x02, 0x00);
+                            apdu.setCmd(json.substr(q*maxLength, r));
+                            if(!manager.transceive(apdu)){
+                                interrupted = true;
+                                break;
+                            }
+                            response = apdu.getRespBytes();
+                        }
+                    }
+                    else if(nfcRequest.getType()==NfcRequest::POST){
+                        // post request
+                        std::cout << "got post request ..." << std::endl;
+                        apdu.reset();
                         if(!manager.transceive(apdu)){
                             interrupted = true;
                             break;
