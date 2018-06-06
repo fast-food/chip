@@ -88,8 +88,10 @@ int main() {
                         }
                     }
                     else if(nfcRequest.getType()==NfcRequest::POST){
-                        // post request
-                        network.postRequest(nfcRequest.getUrl(), nfcRequest.getData(), json);
+                        if(!network.postRequest(nfcRequest.getUrl(), nfcRequest.getData(), json)){
+                            std::cout << "Could not request: " << nfcRequest.getUrl() << std::endl;
+                            break;
+                        }
                         apdu.reset();
                         apdu.setCmd(json);
                         if(!manager.transceive(apdu)){
