@@ -20,7 +20,7 @@ class Network {
     public:
         Network();
         ~Network();
-        bool request(const std::string& url, std::string& result);
+        bool getRequest(const std::string& url, std::string& result);
         bool postRequest(const std::string& url, const std::vector<std::pair<std::string, std::string> >& post, std::string& result);
 };
 

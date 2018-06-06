@@ -17,7 +17,7 @@ size_t Network::writeCallback(char* buf, size_t size, size_t nmemb, void* userda
     return size*nmemb;
 }
 
-bool Network::request(const std::string& url, std::string& result){
+bool Network::getRequest(const std::string& url, std::string& result){
     CURLcode res;
     long http_code = 0;
     mServerData = "";

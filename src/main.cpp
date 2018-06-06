@@ -45,7 +45,7 @@ int main() {
 
                     if(nfcRequest.getType()==NfcRequest::GET){
                         std::string url = nfcRequest.getUrl();
-                        if(!network.request(url, json)){
+                        if(!network.getRequest(url, json)){
                             std::cout << "Could not request: " << url << std::endl;
                             break;
                         }
