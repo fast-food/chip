@@ -11,6 +11,7 @@ bool parseNfcRequest(const std::string& json, NfcRequest& request){
     if (reader.parse(json.c_str(), root)){
         request.setType(root["type"].asInt());
         request.setUrl(root["url"].asString());
+        request.resetData();
         for(const auto& obj : root["data"]){
             request.addData(obj["key"].asString(), obj["value"].asString());
         }

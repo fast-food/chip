@@ -2,7 +2,6 @@
 #define NETWORK
 
 #include <string>
-#include <sstream>
 #include <vector>
 #include <utility>
 #include <curl/curl.h>
