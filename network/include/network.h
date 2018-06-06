@@ -2,6 +2,9 @@
 #define NETWORK
 
 #include <string>
+#include <sstream>
+#include <vector>
+#include <utility>
 #include <curl/curl.h>
 
 class Network {
@@ -18,6 +21,7 @@ class Network {
         Network();
         ~Network();
         bool request(const std::string& url, std::string& result);
+        bool postRequest(const std::string& url, const std::vector<std::pair<std::string, std::string> >& post, std::string& result);
 };
 
 #endif

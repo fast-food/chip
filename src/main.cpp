@@ -89,8 +89,9 @@ int main() {
                     }
                     else if(nfcRequest.getType()==NfcRequest::POST){
                         // post request
-                        std::cout << "got post request ..." << std::endl;
+                        network.postRequest(nfcRequest.getUrl(), nfcRequest.getData(), json);
                         apdu.reset();
+                        apdu.setCmd(json);
                         if(!manager.transceive(apdu)){
                             interrupted = true;
                             break;
